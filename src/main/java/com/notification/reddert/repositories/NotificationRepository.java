@@ -1,4 +1,4 @@
-package com.notification.reddert.repository;
+package com.notification.reddert.repositories;
 
 import com.notification.reddert.model.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
