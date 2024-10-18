@@ -72,23 +72,25 @@ class NotificationServiceTest {
         verify(notificationRepository, times(1)).findById(id);
     }
 
-  /*  @Test
+    @Test
     void markAsRead_shouldUpdateNotificationAndReturnNotificationDTO() {
         // Arrange
-        UUID id = UUID.randomUUID();  // Generate a UUID for the test notification
+        UUID id = UUID.randomUUID();
         Notification notification = new Notification("Test notification", false);
-        notification.setId(id);  // Manually set the ID to avoid NullPointerException
-        when(notificationRepository.findById(id)).thenReturn(Optional.of(notification)); // Mock the repository response
+        notification.setId(id);
+        when(notificationRepository.findById(id)).thenReturn(Optional.of(notification));
+        when(notificationRepository.save(notification)).thenReturn(notification); // Mock save method
 
         // Act
         NotificationDTO result = notificationService.markAsRead(id);
 
         // Assert
         assertNotNull(result);
-        assertEquals(id, result.id());  // Ensure the ID is correctly passed to the DTO
-        assertTrue(result.read());  // Ensure the read status is updated
+        assertEquals(id, result.id());
+        assertTrue(result.read());
         verify(notificationRepository, times(1)).save(notification);
-    } */
+    }
+
 
 
     @Test
