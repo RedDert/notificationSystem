@@ -1,0 +1,26 @@
+
+name: Lint Code
+
+# Trigger the workflow on every push, regardless of the branch
+on:
+  push:
+    branches: ['*']
+
+jobs:
+  lint:
+    runs-on: self-hosted
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up JDK 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # Temurin is the recommended distribution
+          java-version: '21'
+
+      # Step 3: Lint the code using Maven Checkstyle plugin (or your preferred linter)
+      - name: Lint Code
+        run: mvn checkstyle:check
