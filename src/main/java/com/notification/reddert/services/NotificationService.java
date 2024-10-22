@@ -12,16 +12,21 @@ import java.util.stream.Collectors;
 
 @Service
 public class NotificationService {
-
     private final NotificationRepository notificationRepository;
+    private final EmailService emailService;
 
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, EmailService emailService) {
         this.notificationRepository = notificationRepository;
+        this.emailService = emailService;
     }
 
     public NotificationDTO createNotification(CreateNotificationDTO createNotificationDTO) {
         Notification notification = new Notification(createNotificationDTO.message(), false);
-        return NotificationDTO.fromEntity(notificationRepository.save(notification));
+        Notification savedNotification = notificationRepository.save(notification);
+
+        emailService.sendNotificationEmail("user@example.com", "New Notification", "You have a new notification: " + savedNotification.getMessage());
+
+        return NotificationDTO.fromEntity(savedNotification);
     }
 
     public List<NotificationDTO> getAllNotifications() {
