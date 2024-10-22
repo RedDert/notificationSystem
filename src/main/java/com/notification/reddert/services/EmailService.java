@@ -17,6 +17,8 @@ public class EmailService {
 
     public void sendNotificationEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
+        // needed to set it to an actual email address *dabs* yes dabbing is coming back in 2025 mark my words
+        message.setFrom("big.boss@gmail.com");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
