@@ -24,7 +24,8 @@ public class NotificationService {
         Notification notification = new Notification(createNotificationDTO.message(), false);
         Notification savedNotification = notificationRepository.save(notification);
 
-        emailService.sendNotificationEmail("user@example.com", "New Notification", "You have a new notification: " + savedNotification.getMessage());
+        emailService.sendNotificationEmail("user@example.com", "New Notification",
+                "You have a new notification: " + savedNotification.getMessage());
 
         return NotificationDTO.fromEntity(savedNotification);
     }

@@ -17,12 +17,14 @@ import static org.mockito.Mockito.*;
 class NotificationServiceTest {
 
     private NotificationRepository notificationRepository;
+    private EmailService emailService;
     private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
         notificationRepository = mock(NotificationRepository.class);
-        notificationService = new NotificationService(notificationRepository);
+        emailService = mock(EmailService.class); // Mock the EmailService
+        notificationService = new NotificationService(notificationRepository, emailService);
     }
 
     @Test
@@ -39,6 +41,11 @@ class NotificationServiceTest {
         assertNotNull(result);
         assertEquals("Test notification", result.message());
         verify(notificationRepository, times(1)).save(any(Notification.class));
+        verify(emailService, times(1)).sendNotificationEmail(
+                eq("user@example.com"),
+                eq("New Notification"),
+                eq("You have a new notification: " + notification.getMessage())
+        );
     }
 
     @Test
@@ -52,7 +59,7 @@ class NotificationServiceTest {
 
         // Assert
         assertEquals(1, result.size());
-        assertEquals("Test notification", result.getFirst().message());
+        assertEquals("Test notification", result.get(0).message());
         verify(notificationRepository, times(1)).findAll();
     }
 
@@ -61,6 +68,7 @@ class NotificationServiceTest {
         // Arrange
         UUID id = UUID.randomUUID();
         Notification notification = new Notification("Test notification", false);
+        notification.setId(id); // Set the ID
         when(notificationRepository.findById(id)).thenReturn(Optional.of(notification));
 
         // Act
@@ -69,6 +77,7 @@ class NotificationServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("Test notification", result.message());
+        assertEquals(id, result.id());
         verify(notificationRepository, times(1)).findById(id);
     }
 
@@ -90,8 +99,6 @@ class NotificationServiceTest {
         assertTrue(result.read());
         verify(notificationRepository, times(1)).save(notification);
     }
-
-
 
     @Test
     void deleteNotification_shouldRemoveNotification() {
