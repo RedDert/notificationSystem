@@ -1,11 +1,11 @@
-package com.reddert.services;
+package com.reddert.notificationsystem.services;
 
-import com.reddert.notification.dtos.CreateNotificationDTO;
-import com.reddert.notification.dtos.NotificationDTO;
-import com.reddert.notification.model.Notification;
-import com.reddert.notification.repositories.NotificationRepository;
-import com.reddert.notification.services.EmailService;
-import com.reddert.notification.services.NotificationService;
+import com.reddert.notificationsystem.notification.dtos.CreateNotificationDTO;
+import com.reddert.notificationsystem.notification.dtos.NotificationDTO;
+import com.reddert.notificationsystem.notification.model.Notification;
+import com.reddert.notificationsystem.notification.repositories.NotificationRepository;
+import com.reddert.notificationsystem.notification.services.EmailService;
+import com.reddert.notificationsystem.notification.services.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
