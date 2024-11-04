@@ -1,6 +1,6 @@
-package com.notification.reddert.dtos;
+package com.reddert.notificationsystem.notification.dtos;
 
-import com.notification.reddert.model.Notification;
+import com.reddert.notificationsystem.notification.model.Notification;
 import java.util.UUID;
 
 public record NotificationDTO(UUID id, String message, boolean read) {

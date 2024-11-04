@@ -1,4 +1,4 @@
-package com.notification.reddert.model;
+package com.reddert.notificationsystem.notification.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

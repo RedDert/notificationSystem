@@ -1,8 +1,9 @@
-package com.notification.reddert.controllers;
+package com.reddert.controllers;
 
-import com.notification.reddert.dtos.CreateNotificationDTO;
-import com.notification.reddert.dtos.NotificationDTO;
-import com.notification.reddert.services.NotificationService;
+import com.reddert.notification.controllers.NotificationController;
+import com.reddert.notification.dtos.CreateNotificationDTO;
+import com.reddert.notification.dtos.NotificationDTO;
+import com.reddert.notification.services.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
