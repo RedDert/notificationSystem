@@ -1,9 +1,9 @@
-package com.notification.reddert.services;
+package com.reddert.notificationsystem.notification.services;
 
-import com.notification.reddert.dtos.CreateNotificationDTO;
-import com.notification.reddert.dtos.NotificationDTO;
-import com.notification.reddert.model.Notification;
-import com.notification.reddert.repositories.NotificationRepository;
+import com.reddert.notificationsystem.notification.dtos.CreateNotificationDTO;
+import com.reddert.notificationsystem.notification.dtos.NotificationDTO;
+import com.reddert.notificationsystem.notification.model.Notification;
+import com.reddert.notificationsystem.notification.repositories.NotificationRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

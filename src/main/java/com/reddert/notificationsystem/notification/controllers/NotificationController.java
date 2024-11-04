@@ -1,8 +1,8 @@
-package com.notification.reddert.controllers;
+package com.reddert.notificationsystem.notification.controllers;
 
-import com.notification.reddert.dtos.CreateNotificationDTO;
-import com.notification.reddert.dtos.NotificationDTO;
-import com.notification.reddert.services.NotificationService;
+import com.reddert.notificationsystem.notification.services.NotificationService;
+import com.reddert.notificationsystem.notification.dtos.CreateNotificationDTO;
+import com.reddert.notificationsystem.notification.dtos.NotificationDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

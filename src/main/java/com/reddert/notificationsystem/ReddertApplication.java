@@ -1,4 +1,4 @@
-package com.notification.reddert;
+package com.reddert.notificationsystem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

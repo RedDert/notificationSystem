@@ -1,4 +1,4 @@
-package com.notification.reddert.exceptions;
+package com.reddert.notificationsystem.notification.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;

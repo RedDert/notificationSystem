@@ -1,4 +1,4 @@
-package com.notification.reddert.services;
+package com.reddert.notificationsystem.notification.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;

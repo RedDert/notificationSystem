@@ -1,5 +1,6 @@
-package com.notification.reddert.services;
+package com.reddert.notificationsystem.services;
 
+import com.reddert.notificationsystem.notification.services.EmailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
