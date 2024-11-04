@@ -27,7 +27,7 @@ class EmailServiceIntegrationTest {
             try {
                 mailSender.send(message);
             } catch (MailException e) {
-                // Handle potential errors without failing the test, in case the SMTP server is unreachable
+                // Handle potential errors without failing the test, in case the SMTP server is unreachable, test
                 throw new RuntimeException("Email configuration test failed.", e);
             }
         });
