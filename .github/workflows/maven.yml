@@ -10,6 +10,9 @@ jobs:
   build:
 
     runs-on: self-hosted
+    env:
+      EMAIL_USERNAME: ${{ secrets.TEST_EMAIL }}
+      EMAIL_PASSWORD: ${{ secrets.TEST_PASSWD }}
 
     steps:
     - name: Checkout code
