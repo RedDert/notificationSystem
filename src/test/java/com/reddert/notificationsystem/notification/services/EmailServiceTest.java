@@ -1,4 +1,4 @@
-package com.reddert.notificationsystem.services;
+package com.reddert.notificationsystem.notification.services;
 
 import com.reddert.notificationsystem.notification.services.EmailService;
 import org.junit.jupiter.api.BeforeEach;

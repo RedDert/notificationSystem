@@ -1,4 +1,4 @@
-package com.reddert.notificationsystem.services;
+package com.reddert.notificationsystem.notification.services;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ class EmailServiceIntegrationTest {
 
     @Autowired
     private JavaMailSender mailSender;
-    //this test is disabled to get around the build issues on the remote, you should only enable it if you have the .env file
 
     @Test
     void testEmailConfiguration() {
