@@ -1,6 +1,6 @@
-package com.reddert.notificationsystem.controllers;
+package com.reddert.notificationsystem.notification.controllers;
 
-import com.reddert.notificationsystem.notification.controllers.NotificationController;
+import com.reddert.notificationsystem.notification.NotificationController;
 import com.reddert.notificationsystem.notification.dtos.CreateNotificationDTO;
 import com.reddert.notificationsystem.notification.dtos.NotificationDTO;
 import com.reddert.notificationsystem.notification.services.NotificationService;

@@ -1,4 +1,4 @@
-package com.reddert.notificationsystem.services;
+package com.reddert.notificationsystem.notification.services;
 
 import com.reddert.notificationsystem.notification.dtos.CreateNotificationDTO;
 import com.reddert.notificationsystem.notification.dtos.NotificationDTO;

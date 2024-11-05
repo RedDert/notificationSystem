@@ -1,4 +1,4 @@
-package com.reddert.notificationsystem.services;
+package com.reddert.notificationsystem.notification.services;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
