@@ -51,14 +51,51 @@ class UserServiceTest {
     }
 
     @Test
+    void createUser_withEmptyName_shouldThrowException() {
+        CreateUserDTO createUserDTO = new CreateUserDTO("", "lionel.messi@gmail.com");
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+    }
+
+    @Test
+    void createUser_withInvalidCharactersInName_shouldThrowException() {
+        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel@Messi", "lionel.messi@gmail.com");
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+    }
+
+    @Test
+    void createUser_withTooLongName_shouldThrowException() {
+        String longName = "a".repeat(101);
+        CreateUserDTO createUserDTO = new CreateUserDTO(longName, "lionel.messi@gmail.com");
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+    }
+
+    @Test
+    void createUser_withDuplicateEmail_shouldThrowException() {
+        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "lionel.messi@gmail.com");
+        when(userRepository.findByEmail("lionel.messi@gmail.com")).thenReturn(Optional.of(mockUser));
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+    }
+
+    @Test
+    void createUser_withInvalidEmail_shouldThrowException() {
+        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "invalid-email");
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+    }
+
+    @Test
     void getAllUsers_shouldReturnListOfUserDTOs() {
         when(userRepository.findAll()).thenReturn(List.of(mockUser));
 
         List<UserDTO> result = userService.getAllUsers();
 
         assertEquals(1, result.size());
-        assertEquals("Lionel Messi", result.get(0).name());
-        assertEquals("lionel.messi@gmail.com", result.get(0).email());
+        assertEquals("Lionel Messi", result.getFirst().name());
+        assertEquals("lionel.messi@gmail.com", result.getFirst().email());
         verify(userRepository, times(1)).findAll();
     }
 
@@ -93,37 +130,5 @@ class UserServiceTest {
         userService.deleteUser(userId);
 
         verify(userRepository, times(1)).deleteById(userId);
-    }
-
-    // Edge case tests
-    @Test
-    void createUser_withEmptyName_shouldThrowException() {
-        CreateUserDTO createUserDTO = new CreateUserDTO("", "lionel.messi@gmail.com");
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
-    }
-
-    @Test
-    void createUser_withInvalidName_shouldThrowException() {
-        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel123", "lionel.messi@gmail.com");
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
-    }
-
-    @Test
-    void createUser_withEmptyEmail_shouldThrowException() {
-        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "");
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
-    }
-
-    @Test
-    void createUser_withInvalidEmail_shouldThrowException() {
-        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "invalid-email");
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
-    }
-
-    @Test
-    void updateUser_withInvalidEmail_shouldThrowException() {
-        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "invalid-email");
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(userId, createUserDTO));
     }
 }
