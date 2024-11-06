@@ -39,14 +39,11 @@ class UserServiceTest {
 
     @Test
     void createUser_shouldReturnUserDTO() {
-        // Arrange
         CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "lionel.messi@gmail.com");
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
 
-        // Act
         UserDTO result = userService.createUser(createUserDTO);
 
-        // Assert
         assertNotNull(result);
         assertEquals("Lionel Messi", result.name());
         assertEquals("lionel.messi@gmail.com", result.email());
@@ -55,28 +52,22 @@ class UserServiceTest {
 
     @Test
     void getAllUsers_shouldReturnListOfUserDTOs() {
-        // Arrange
         when(userRepository.findAll()).thenReturn(List.of(mockUser));
 
-        // Act
         List<UserDTO> result = userService.getAllUsers();
 
-        // Assert
         assertEquals(1, result.size());
-        assertEquals("Lionel Messi", result.getFirst().name());
-        assertEquals("lionel.messi@gmail.com", result.getFirst().email());
+        assertEquals("Lionel Messi", result.get(0).name());
+        assertEquals("lionel.messi@gmail.com", result.get(0).email());
         verify(userRepository, times(1)).findAll();
     }
 
     @Test
     void getUserById_shouldReturnUserDTO() {
-        // Arrange
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
-        // Act
         UserDTO result = userService.getUserById(userId);
 
-        // Assert
         assertNotNull(result);
         assertEquals("Lionel Messi", result.name());
         assertEquals("lionel.messi@gmail.com", result.email());
@@ -85,15 +76,12 @@ class UserServiceTest {
 
     @Test
     void updateUser_shouldReturnUpdatedUserDTO() {
-        // Arrange
         CreateUserDTO updatedUserDTO = new CreateUserDTO("Lionel Messi Updated", "lionel.messi.updated@gmail.com");
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(userRepository.save(mockUser)).thenReturn(mockUser);
 
-        // Act
         UserDTO result = userService.updateUser(userId, updatedUserDTO);
 
-        // Assert
         assertNotNull(result);
         assertEquals("Lionel Messi Updated", result.name());
         assertEquals("lionel.messi.updated@gmail.com", result.email());
@@ -102,10 +90,40 @@ class UserServiceTest {
 
     @Test
     void deleteUser_shouldInvokeRepositoryDeleteById() {
-        // Act
         userService.deleteUser(userId);
 
-        // Assert
         verify(userRepository, times(1)).deleteById(userId);
+    }
+
+    // Edge case tests
+    @Test
+    void createUser_withEmptyName_shouldThrowException() {
+        CreateUserDTO createUserDTO = new CreateUserDTO("", "lionel.messi@gmail.com");
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+    }
+
+    @Test
+    void createUser_withInvalidName_shouldThrowException() {
+        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel123", "lionel.messi@gmail.com");
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+    }
+
+    @Test
+    void createUser_withEmptyEmail_shouldThrowException() {
+        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "");
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+    }
+
+    @Test
+    void createUser_withInvalidEmail_shouldThrowException() {
+        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "invalid-email");
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+    }
+
+    @Test
+    void updateUser_withInvalidEmail_shouldThrowException() {
+        CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "invalid-email");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(userId, createUserDTO));
     }
 }
