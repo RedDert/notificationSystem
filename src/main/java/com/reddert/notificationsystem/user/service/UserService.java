@@ -18,6 +18,22 @@ public class UserService {
     }
 
     public UserDTO createUser(CreateUserDTO createUserDTO) {
+        if (createUserDTO.name() == null || createUserDTO.name().trim().isEmpty()) {
+            throw new IllegalArgumentException("User name cannot be empty.");
+        }
+        if (!createUserDTO.name().matches("[A-Za-z\\s]+")) {
+            throw new IllegalArgumentException("User name can only contain alphabetic characters.");
+        }
+        if (createUserDTO.name().length() > 100) {
+            throw new IllegalArgumentException("User name is too long.");
+        }
+        if (userRepository.findByEmail(createUserDTO.email()).isPresent()) {
+            throw new IllegalArgumentException("Email is already associated with an existing user.");
+        }
+        if (isValidEmail(createUserDTO.email())) {
+            throw new IllegalArgumentException("Invalid email format.");
+        }
+
         User user = new User(createUserDTO.name(), createUserDTO.email());
         User savedUser = userRepository.save(user);
         return UserDTO.fromEntity(savedUser);
@@ -39,6 +55,12 @@ public class UserService {
     public UserDTO updateUser(UUID id, CreateUserDTO createUserDTO) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (createUserDTO.name().length() > 100) {
+            throw new IllegalArgumentException("User name is too long.");
+        }
+        if (isValidEmail(createUserDTO.email())) {
+            throw new IllegalArgumentException("Invalid email format.");
+        }
         user.setName(createUserDTO.name());
         user.setEmail(createUserDTO.email());
         User updatedUser = userRepository.save(user);
@@ -47,5 +69,10 @@ public class UserService {
 
     public void deleteUser(UUID id) {
         userRepository.deleteById(id);
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email == null || !email.matches(emailRegex);
     }
 }

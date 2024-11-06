@@ -4,29 +4,34 @@ import com.reddert.notificationsystem.notification.dtos.CreateNotificationDTO;
 import com.reddert.notificationsystem.notification.dtos.NotificationDTO;
 import com.reddert.notificationsystem.notification.model.Notification;
 import com.reddert.notificationsystem.notification.repositories.NotificationRepository;
-import com.reddert.notificationsystem.notification.services.EmailService;
-import com.reddert.notificationsystem.notification.services.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class NotificationServiceTest {
 
+    @Mock
     private NotificationRepository notificationRepository;
+
+    @Mock
     private EmailService emailService;
+
+    @InjectMocks
     private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
-        notificationRepository = mock(NotificationRepository.class);
-        emailService = mock(EmailService.class); // Mock the EmailService
-        notificationService = new NotificationService(notificationRepository, emailService);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -70,7 +75,7 @@ class NotificationServiceTest {
         // Arrange
         UUID id = UUID.randomUUID();
         Notification notification = new Notification("Test notification", false);
-        notification.setId(id); // Set the ID
+        notification.setId(id);
         when(notificationRepository.findById(id)).thenReturn(Optional.of(notification));
 
         // Act
@@ -90,7 +95,7 @@ class NotificationServiceTest {
         Notification notification = new Notification("Test notification", false);
         notification.setId(id);
         when(notificationRepository.findById(id)).thenReturn(Optional.of(notification));
-        when(notificationRepository.save(notification)).thenReturn(notification); // Mock save method
+        when(notificationRepository.save(notification)).thenReturn(notification);
 
         // Act
         NotificationDTO result = notificationService.markAsRead(id);
@@ -113,4 +118,42 @@ class NotificationServiceTest {
         // Assert
         verify(notificationRepository, times(1)).deleteById(id);
     }
+
+    @Test
+    void createNotification_withEmptyMessage_shouldThrowException() {
+        // Arrange
+        CreateNotificationDTO createNotificationDTO = new CreateNotificationDTO("");
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> notificationService.createNotification(createNotificationDTO));
+    }
+
+    @Test
+    void createNotification_withTooLongMessage_shouldThrowException() {
+        // Arrange
+        String longMessage = "a".repeat(501);
+        CreateNotificationDTO createNotificationDTO = new CreateNotificationDTO(longMessage);
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> notificationService.createNotification(createNotificationDTO));
+    }
+
+    @Test
+    void createNotification_withInvalidEmail_shouldThrowException() {
+        // Arrange
+        CreateNotificationDTO createNotificationDTO = new CreateNotificationDTO("Test message");
+
+        // Mock the repository to save and return a valid notification before throwing exception on email send
+        Notification notification = new Notification("Test message", false);
+        when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
+
+        // Mock the email service to throw an exception on invalid email
+        doThrow(new IllegalArgumentException("Invalid email address."))
+                .when(emailService)
+                .sendNotificationEmail(anyString(), anyString(), anyString());
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> notificationService.createNotification(createNotificationDTO));
+    }
+
 }
