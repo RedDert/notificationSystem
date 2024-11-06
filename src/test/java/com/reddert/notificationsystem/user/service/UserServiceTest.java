@@ -110,8 +110,8 @@ class UserServiceTest {
 
         // Assert
         assertEquals(1, result.size());
-        assertEquals("Lionel Messi", result.get(0).name());
-        assertEquals("lionel.messi@gmail.com", result.get(0).email());
+        assertEquals("Lionel Messi", result.getFirst().name());
+        assertEquals("lionel.messi@gmail.com", result.getFirst().email());
         verify(userRepository, times(1)).findAll();
     }
 
