@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Owner
+actor Admin
+actor Member
+actor Guest
+
+rectangle "Team Management" {
+    usecase "Change Role of Any Member" as UC1
+    usecase "Promote Another User to Owner\n(and Demote Self to Admin)" as UC2
+    usecase "Change Role of Non-Admin Members" as UC3
+}
+
+Owner --> UC1
+Owner --> UC2
+
+Admin --> UC3
+
+note right of Owner
+- Can change roles of all members
+- Can make another user Owner
+- Becomes Admin after transferring ownership
+end note
+
+note right of Admin
+- Can change roles of Members and Guests
+- Cannot change roles of Owners or other Admins
+end note
+
+Member --> UC3 : Not Allowed
+Guest --> UC3 : Not Allowed
+
+@enduml
+

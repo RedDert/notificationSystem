@@ -57,6 +57,11 @@
 			<artifactId>jakarta.validation-api</artifactId>
 			<version>3.0.2</version>
 		</dependency>
+    <dependency>
+      <groupId>com.github.davidmoten</groupId>
+      <artifactId>plantuml-maven-plugin</artifactId>
+      <version>0.2.12</version>
+    </dependency>
 	</dependencies>
 
 	<build>
@@ -89,6 +94,36 @@
           <configLocation>config/checkstyle/checkstyle.xml</configLocation>
         </configuration>
       </plugin>
+       <plugin>
+            <groupId>com.github.davidmoten</groupId>
+            <artifactId>plantuml-maven-plugin</artifactId>
+            <version>0.2.12</version>
+            <executions>
+                <execution>
+                    <id>generate-diagrams</id>
+                    <phase>generate-resources</phase>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                    <configuration>
+                        <sources>
+                            <directory>${basedir}/src/main/plantuml</directory>
+                            <includes>
+                                <include>**/*.puml</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/ignore-me.puml</exclude>
+                            </excludes>
+                        </sources>
+                        <outputDirectory>${project.build.directory}/generated-diagrams</outputDirectory>
+                        <formats>
+                            <format>svg</format>
+                        </formats>
+                        <preserveDirectoryStructure>true</preserveDirectoryStructure>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
 		</plugins>
 	</build>
 
