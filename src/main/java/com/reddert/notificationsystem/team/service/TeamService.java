@@ -180,7 +180,7 @@ public class TeamService {
   public List<TeamDTO> getAllTeams() {
 
     List<Team> teams = teamRepository.findAll();
-    if (teams.size() == 0) {
+    if (teams.isEmpty()) {
       throw new EntityNotFoundException("No Teams found");
     }
     return teams.stream()
@@ -210,10 +210,10 @@ public class TeamService {
     
     try {
       RoleType targetNewRoleType  = RoleType.valueOf(roleTypeString.toUpperCase());
-    } catch {
-      throw new IllegalArgumentException();
+    } catch Exception e; {
+      throw new IllegalArgumentException(e);
   }
-
+/*
     Role targetNewRole =
         roleRepository
             .findByRoleType(targetNewRoleType)
@@ -233,7 +233,7 @@ public class TeamService {
 
     } else {
       throw new TeamExceptionHandler("Not in same team.");
-    }
+    } */
   }
 
   private boolean isMemberOfTeam(UUID userId, UUID teamId) {
