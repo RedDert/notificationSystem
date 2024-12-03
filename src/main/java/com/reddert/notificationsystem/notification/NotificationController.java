@@ -1,8 +1,8 @@
 package com.reddert.notificationsystem.notification;
 
-import com.reddert.notificationsystem.notification.services.NotificationService;
 import com.reddert.notificationsystem.notification.dtos.CreateNotificationDTO;
 import com.reddert.notificationsystem.notification.dtos.NotificationDTO;
+import com.reddert.notificationsystem.notification.services.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/users/{userId}/notifications")
 public class NotificationController {
 
     private final NotificationService notificationService;
@@ -19,7 +19,7 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    @PostMapping("/users/{userId}/notifications")
+    @PostMapping
     public ResponseEntity<NotificationDTO> createNotification(
             @PathVariable UUID userId,
             @RequestBody CreateNotificationDTO createNotificationDTO
@@ -29,30 +29,41 @@ public class NotificationController {
         );
     }
 
-
     @GetMapping
-    public ResponseEntity<List<NotificationDTO>> getAllNotifications() {
-        return ResponseEntity.ok(notificationService.getAllNotifications());
+    public ResponseEntity<List<NotificationDTO>> getAllNotifications(@PathVariable UUID userId) {
+        return ResponseEntity.ok(notificationService.getAllNotificationsForUser(userId));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NotificationDTO> getNotificationById(@PathVariable UUID id) {
-        return ResponseEntity.ok(notificationService.getNotificationById(id));
+    public ResponseEntity<NotificationDTO> getNotificationById(
+            @PathVariable UUID userId,
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity.ok(notificationService.getNotificationById(userId, id));
     }
 
     @PutMapping("/{id}/read")
-    public ResponseEntity<NotificationDTO> markAsRead(@PathVariable UUID id) {
-        return ResponseEntity.ok(notificationService.markAsRead(id));
+    public ResponseEntity<NotificationDTO> markAsRead(
+            @PathVariable UUID userId,
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity.ok(notificationService.markAsRead(userId, id));
     }
 
     @PutMapping("/{id}/unread")
-    public ResponseEntity<NotificationDTO> markAsUnread(@PathVariable UUID id) {
-        return ResponseEntity.ok(notificationService.markAsUnread(id));
+    public ResponseEntity<NotificationDTO> markAsUnread(
+            @PathVariable UUID userId,
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity.ok(notificationService.markAsUnread(userId, id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNotification(@PathVariable UUID id) {
-        notificationService.deleteNotification(id);
+    public ResponseEntity<Void> deleteNotification(
+            @PathVariable UUID userId,
+            @PathVariable UUID id
+    ) {
+        notificationService.deleteNotification(userId, id);
         return ResponseEntity.noContent().build();
     }
 }

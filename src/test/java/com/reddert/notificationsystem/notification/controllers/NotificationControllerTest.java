@@ -34,18 +34,19 @@ class NotificationControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Initialize userId
         userId = UUID.randomUUID();
-
-        // Create a mock NotificationDTO
         NotificationDTO mockNotification = new NotificationDTO(UUID.randomUUID(), "Test notification", false);
 
-        // Mock NotificationService methods
-        when(notificationService.createNotification(eq(userId), any(CreateNotificationDTO.class))).thenReturn(mockNotification);
-        when(notificationService.getAllNotifications()).thenReturn(List.of(mockNotification));
-        when(notificationService.getNotificationById(any(UUID.class))).thenReturn(mockNotification);
-        when(notificationService.markAsRead(any(UUID.class))).thenReturn(mockNotification);
-        when(notificationService.markAsUnread(any(UUID.class))).thenReturn(mockNotification);
+        when(notificationService.createNotification(eq(userId), any(CreateNotificationDTO.class)))
+                .thenReturn(mockNotification);
+        when(notificationService.getAllNotificationsForUser(eq(userId)))
+                .thenReturn(List.of(mockNotification));
+        when(notificationService.getNotificationById(eq(userId), any(UUID.class)))
+                .thenReturn(mockNotification);
+        when(notificationService.markAsRead(eq(userId), any(UUID.class)))
+                .thenReturn(mockNotification);
+        when(notificationService.markAsUnread(eq(userId), any(UUID.class)))
+                .thenReturn(mockNotification);
     }
 
     @Test
@@ -61,7 +62,7 @@ class NotificationControllerTest {
 
     @Test
     void getAllNotifications_shouldReturnNotificationList() throws Exception {
-        mockMvc.perform(get("/notifications")
+        mockMvc.perform(get("/users/{userId}/notifications", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
@@ -72,7 +73,7 @@ class NotificationControllerTest {
     void getNotificationById_shouldReturnNotification() throws Exception {
         UUID notificationId = UUID.randomUUID();
 
-        mockMvc.perform(get("/notifications/{id}", notificationId)
+        mockMvc.perform(get("/users/{userId}/notifications/{id}", userId, notificationId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Test notification"));
@@ -82,7 +83,7 @@ class NotificationControllerTest {
     void markAsRead_shouldReturnUpdatedNotification() throws Exception {
         UUID notificationId = UUID.randomUUID();
 
-        mockMvc.perform(put("/notifications/{id}/read", notificationId)
+        mockMvc.perform(put("/users/{userId}/notifications/{id}/read", userId, notificationId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Test notification"));
@@ -92,7 +93,7 @@ class NotificationControllerTest {
     void markAsUnread_shouldReturnUpdatedNotification() throws Exception {
         UUID notificationId = UUID.randomUUID();
 
-        mockMvc.perform(put("/notifications/{id}/unread", notificationId)
+        mockMvc.perform(put("/users/{userId}/notifications/{id}/unread", userId, notificationId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Test notification"));
