@@ -84,7 +84,7 @@ class NotificationServiceTest {
 
         // Assert
         assertEquals(1, result.size());
-        assertEquals("Test notification", result.get(0).message());
+        assertEquals("Test notification", result.getFirst().message());
         verify(notificationRepository, times(1)).findByUser(mockUser);
     }
 
