@@ -34,13 +34,18 @@ class NotificationServiceTest {
 
     private User mockUser;
     private UUID userId;
+    private UUID notificationId;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        userId = UUID.randomUUID();
-        mockUser = new User("Lionel Messi", "lionel.messi@gmail.com");
-        mockUser.setId(userId);
+        try (AutoCloseable mocks = MockitoAnnotations.openMocks(this)) {
+            userId = UUID.randomUUID();
+            notificationId = UUID.randomUUID();
+            mockUser = new User("Lionel Messi", "lionel.messi@gmail.com");
+            mockUser.setId(userId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -71,27 +76,27 @@ class NotificationServiceTest {
     void getAllNotifications_shouldReturnListOfNotificationDTOs() {
         // Arrange
         Notification notification = new Notification("Test notification", false, mockUser);
-        when(notificationRepository.findAll()).thenReturn(List.of(notification));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+        when(notificationRepository.findByUser(mockUser)).thenReturn(List.of(notification));
 
         // Act
-        List<NotificationDTO> result = notificationService.getAllNotifications();
+        List<NotificationDTO> result = notificationService.getAllNotificationsForUser(userId);
 
         // Assert
         assertEquals(1, result.size());
         assertEquals("Test notification", result.get(0).message());
-        verify(notificationRepository, times(1)).findAll();
+        verify(notificationRepository, times(1)).findByUser(mockUser);
     }
 
     @Test
     void getNotificationById_shouldReturnNotificationDTOIfFound() {
         // Arrange
-        UUID notificationId = UUID.randomUUID();
         Notification notification = new Notification("Test notification", false, mockUser);
         notification.setId(notificationId);
         when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(notification));
 
         // Act
-        NotificationDTO result = notificationService.getNotificationById(notificationId);
+        NotificationDTO result = notificationService.getNotificationById(userId, notificationId);
 
         // Assert
         assertNotNull(result);
@@ -103,14 +108,13 @@ class NotificationServiceTest {
     @Test
     void markAsRead_shouldUpdateNotificationAndReturnNotificationDTO() {
         // Arrange
-        UUID notificationId = UUID.randomUUID();
         Notification notification = new Notification("Test notification", false, mockUser);
         notification.setId(notificationId);
         when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(notification));
         when(notificationRepository.save(notification)).thenReturn(notification);
 
         // Act
-        NotificationDTO result = notificationService.markAsRead(notificationId);
+        NotificationDTO result = notificationService.markAsRead(userId, notificationId);
 
         // Assert
         assertNotNull(result);
@@ -122,13 +126,15 @@ class NotificationServiceTest {
     @Test
     void deleteNotification_shouldRemoveNotification() {
         // Arrange
-        UUID notificationId = UUID.randomUUID();
+        Notification notification = new Notification("Test notification", false, mockUser);
+        notification.setId(notificationId);
+        when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(notification));
 
         // Act
-        notificationService.deleteNotification(notificationId);
+        notificationService.deleteNotification(userId, notificationId);
 
         // Assert
-        verify(notificationRepository, times(1)).deleteById(notificationId);
+        verify(notificationRepository, times(1)).delete(notification);
     }
 
     @Test

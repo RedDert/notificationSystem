@@ -7,6 +7,7 @@ import com.reddert.notificationsystem.notification.repositories.NotificationRepo
 import com.reddert.notificationsystem.user.model.User;
 import com.reddert.notificationsystem.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -65,37 +66,53 @@ public class NotificationService {
         return NotificationDTO.fromEntity(savedNotification);
     }
 
-    public List<NotificationDTO> getAllNotifications() {
-        return notificationRepository.findAll()
+    public List<NotificationDTO> getAllNotificationsForUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return notificationRepository.findByUser(user)
                 .stream()
                 .map(NotificationDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public NotificationDTO getNotificationById(UUID id) {
-        return notificationRepository.findById(id)
-                .map(NotificationDTO::fromEntity)
+    public NotificationDTO getNotificationById(UUID userId, UUID notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
+
+        if (!notification.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Notification does not belong to the user");
+        }
+
+        return NotificationDTO.fromEntity(notification);
     }
 
-    public NotificationDTO markAsRead(UUID id) {
-        Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
+    public NotificationDTO markAsRead(UUID userId, UUID notificationId) {
+        Notification notification = getNotificationByUserId(userId, notificationId);
         notification.setRead(true);
-        Notification updatedNotification = notificationRepository.save(notification);
-        return NotificationDTO.fromEntity(updatedNotification);
+        return NotificationDTO.fromEntity(notificationRepository.save(notification));
     }
 
-    public NotificationDTO markAsUnread(UUID id) {
-        Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
+    public NotificationDTO markAsUnread(UUID userId, UUID notificationId) {
+        Notification notification = getNotificationByUserId(userId, notificationId);
         notification.setRead(false);
-        Notification updatedNotification = notificationRepository.save(notification);
-        return NotificationDTO.fromEntity(updatedNotification);
+        return NotificationDTO.fromEntity(notificationRepository.save(notification));
     }
 
-    public void deleteNotification(UUID id) {
-        notificationRepository.deleteById(id);
+    public void deleteNotification(UUID userId, UUID notificationId) {
+        Notification notification = getNotificationByUserId(userId, notificationId);
+        notificationRepository.delete(notification);
+    }
+
+    private Notification getNotificationByUserId(UUID userId, UUID notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
+
+        if (!notification.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Notification does not belong to the user");
+        }
+
+        return notification;
     }
 
     private boolean isValidEmail(String email) {
