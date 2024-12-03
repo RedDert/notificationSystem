@@ -19,10 +19,16 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    @PostMapping
-    public ResponseEntity<NotificationDTO> createNotification(@RequestBody CreateNotificationDTO createNotificationDTO) {
-        return ResponseEntity.ok(notificationService.createNotification(createNotificationDTO));
+    @PostMapping("/users/{userId}/notifications")
+    public ResponseEntity<NotificationDTO> createNotification(
+            @PathVariable UUID userId,
+            @RequestBody CreateNotificationDTO createNotificationDTO
+    ) {
+        return ResponseEntity.ok(
+                notificationService.createNotification(userId, createNotificationDTO)
+        );
     }
+
 
     @GetMapping
     public ResponseEntity<List<NotificationDTO>> getAllNotifications() {

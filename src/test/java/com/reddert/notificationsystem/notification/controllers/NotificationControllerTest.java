@@ -6,6 +6,7 @@ import com.reddert.notificationsystem.notification.dtos.NotificationDTO;
 import com.reddert.notificationsystem.notification.services.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -29,13 +30,18 @@ class NotificationControllerTest {
     @MockBean
     private NotificationService notificationService;
 
+    private UUID userId;
+
     @BeforeEach
     void setUp() {
+        // Initialize userId
+        userId = UUID.randomUUID();
+
         // Create a mock NotificationDTO
         NotificationDTO mockNotification = new NotificationDTO(UUID.randomUUID(), "Test notification", false);
 
         // Mock NotificationService methods
-        when(notificationService.createNotification(any(CreateNotificationDTO.class))).thenReturn(mockNotification);
+        when(notificationService.createNotification(eq(userId), any(CreateNotificationDTO.class))).thenReturn(mockNotification);
         when(notificationService.getAllNotifications()).thenReturn(List.of(mockNotification));
         when(notificationService.getNotificationById(any(UUID.class))).thenReturn(mockNotification);
         when(notificationService.markAsRead(any(UUID.class))).thenReturn(mockNotification);
@@ -46,7 +52,7 @@ class NotificationControllerTest {
     void createNotification_shouldReturnCreatedNotification() throws Exception {
         String requestBody = "{\"message\":\"Test notification\"}";
 
-        mockMvc.perform(post("/notifications")
+        mockMvc.perform(post("/users/{userId}/notifications", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
