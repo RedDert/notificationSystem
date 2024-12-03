@@ -4,6 +4,8 @@ import com.reddert.notificationsystem.notification.dtos.CreateNotificationDTO;
 import com.reddert.notificationsystem.notification.dtos.NotificationDTO;
 import com.reddert.notificationsystem.notification.model.Notification;
 import com.reddert.notificationsystem.notification.repositories.NotificationRepository;
+import com.reddert.notificationsystem.user.model.User;
+import com.reddert.notificationsystem.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
@@ -11,15 +13,23 @@ import java.util.stream.Collectors;
 
 @Service
 public class NotificationService {
+
     private final NotificationRepository notificationRepository;
     private final EmailService emailService;
+    private final UserRepository userRepository;
 
-    public NotificationService(NotificationRepository notificationRepository, EmailService emailService) {
+    public NotificationService(
+            NotificationRepository notificationRepository,
+            EmailService emailService,
+            UserRepository userRepository
+    ) {
         this.notificationRepository = notificationRepository;
         this.emailService = emailService;
+        this.userRepository = userRepository;
     }
 
-    public NotificationDTO createNotification(CreateNotificationDTO createNotificationDTO) {
+    public NotificationDTO createNotification(UUID userId, CreateNotificationDTO createNotificationDTO) {
+        // Validate message
         if (createNotificationDTO.message() == null || createNotificationDTO.message().trim().isEmpty()) {
             throw new IllegalArgumentException("Notification message cannot be empty.");
         }
@@ -27,14 +37,25 @@ public class NotificationService {
             throw new IllegalArgumentException("Notification message is too long.");
         }
 
-        String recipientEmail = "user@example.com";
+        // Retrieve User
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Validate email
+        String recipientEmail = user.getEmail();
         if (!isValidEmail(recipientEmail)) {
             throw new IllegalArgumentException("Invalid email address.");
         }
 
-        Notification notification = new Notification(createNotificationDTO.message(), false);
+        // Create and save Notification
+        Notification notification = new Notification(
+                createNotificationDTO.message(),
+                false,
+                user
+        );
         Notification savedNotification = notificationRepository.save(notification);
 
+        // Send Email
         emailService.sendNotificationEmail(
                 recipientEmail,
                 "New Notification",
@@ -61,14 +82,16 @@ public class NotificationService {
         Notification notification = notificationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
         notification.setRead(true);
-        return NotificationDTO.fromEntity(notificationRepository.save(notification));
+        Notification updatedNotification = notificationRepository.save(notification);
+        return NotificationDTO.fromEntity(updatedNotification);
     }
 
     public NotificationDTO markAsUnread(UUID id) {
         Notification notification = notificationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
         notification.setRead(false);
-        return NotificationDTO.fromEntity(notificationRepository.save(notification));
+        Notification updatedNotification = notificationRepository.save(notification);
+        return NotificationDTO.fromEntity(updatedNotification);
     }
 
     public void deleteNotification(UUID id) {
