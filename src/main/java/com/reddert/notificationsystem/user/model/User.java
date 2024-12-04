@@ -60,4 +60,15 @@ public class User {
     public void setNotifications(List<Notification> notifications) {
         this.notifications = notifications;
     }
+    // Adds a notification to the user's list if it's not already present
+    public void addNotification(Notification notification) {
+        if (!notifications.contains(notification)) {
+            notifications.add(notification);
+        }
+    }
+
+    public void removeNotification(Notification notification) {
+        notifications.remove(notification);
+    }
+
 }
