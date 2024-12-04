@@ -6,6 +6,7 @@ import com.reddert.notificationsystem.notification.model.Notification;
 import com.reddert.notificationsystem.notification.repositories.NotificationRepository;
 import com.reddert.notificationsystem.user.model.User;
 import com.reddert.notificationsystem.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public class NotificationService {
 
         // Retrieve User
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         // Validate email
         String recipientEmail = user.getEmail();
@@ -68,7 +69,7 @@ public class NotificationService {
 
     public List<NotificationDTO> getAllNotificationsForUser(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         return notificationRepository.findByUser(user)
                 .stream()
@@ -78,7 +79,7 @@ public class NotificationService {
 
     public NotificationDTO getNotificationById(UUID userId, UUID notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
 
         if (!notification.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("Notification does not belong to the user");
@@ -106,7 +107,7 @@ public class NotificationService {
 
     private Notification getNotificationByUserId(UUID userId, UUID notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
 
         if (!notification.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("Notification does not belong to the user");
