@@ -23,18 +23,24 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private final User user; // Make the field final for security
 
-    public Notification() {}
+    public Notification() {
+        // Default constructor for JPA
+        this.user = null;
+    }
 
     public Notification(String message, boolean read, User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null for a notification.");
+        }
         this.message = message;
         this.read = read;
         this.timestamp = LocalDateTime.now();
         this.user = user;
     }
 
-    // Getters and setters
+    // Getters and setters but only getters for 'user' field
 
     public UUID getId() {
         return id;
@@ -70,9 +76,5 @@ public class Notification {
 
     public User getUser() {
         return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }
