@@ -6,6 +6,7 @@ import com.reddert.notificationsystem.notification.model.Notification;
 import com.reddert.notificationsystem.notification.repositories.NotificationRepository;
 import com.reddert.notificationsystem.user.model.User;
 import com.reddert.notificationsystem.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -176,6 +177,6 @@ class NotificationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> notificationService.createNotification(userId, createNotificationDTO));
+        assertThrows(EntityNotFoundException.class, () -> notificationService.createNotification(userId, createNotificationDTO));
     }
 }
