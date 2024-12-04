@@ -1,11 +1,8 @@
 package com.reddert.notificationsystem.notification.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.reddert.notificationsystem.user.model.User;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -24,13 +21,26 @@ public class Notification {
     @NotNull
     private LocalDateTime timestamp;
 
-    public Notification() {}
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private final User user; // Make the field final for security
 
-    public Notification(String message, boolean read) {
+    public Notification() {
+        // Default constructor for JPA
+        this.user = null;
+    }
+
+    public Notification(String message, boolean read, User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null for a notification.");
+        }
         this.message = message;
         this.read = read;
         this.timestamp = LocalDateTime.now();
+        this.user = user;
     }
+
+    // Getters and setters but only getters for 'user' field
 
     public UUID getId() {
         return id;
@@ -62,5 +72,9 @@ public class Notification {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public User getUser() {
+        return user;
     }
 }
