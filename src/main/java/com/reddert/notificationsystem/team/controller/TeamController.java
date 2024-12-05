@@ -2,10 +2,13 @@ package com.reddert.notificationsystem.team.controller;
 
 import com.reddert.notificationsystem.team.dtos.CreateTeamDTO;
 import com.reddert.notificationsystem.team.dtos.CreateUserMemberShipDTO;
+import com.reddert.notificationsystem.team.dtos.RoleChangeResponseDTO;
 import com.reddert.notificationsystem.team.dtos.TeamDTO;
 import com.reddert.notificationsystem.team.dtos.UserMembershipDTO;
-import com.reddert.notificationsystem.team.model.RoleType;
 import com.reddert.notificationsystem.team.service.TeamService;
+
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -21,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/teams")
+@RequestMapping("/api/teams")
 public class TeamController {
 
   private final TeamService teamService;
@@ -36,9 +39,9 @@ public class TeamController {
   }
 
   @PostMapping
-  public ResponseEntity<TeamDTO> createTeam(@RequestBody CreateTeamDTO createTeamDTO) {
+  public ResponseEntity<TeamDTO> createTeam(@Valid @RequestBody CreateTeamDTO createTeamDTO) {
     TeamDTO team = teamService.createTeam(createTeamDTO);
-    return ResponseEntity.status(HttpStatus.CREATED).body(team);
+    return new ResponseEntity<>(team, HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}")
@@ -65,13 +68,12 @@ public class TeamController {
   }
 
   @PatchMapping("/{teamId}/members/{targetId}")
-  public ResponseEntity<UserMembershipDTO> changeMemberRole(
+  public ResponseEntity<RoleChangeResponseDTO> changeMemberRole(
       @PathVariable UUID teamId,
       @PathVariable UUID targetId,
       @RequestParam UUID requestorId,
       @RequestParam String roleType) {
 
-    RoleType roleTypeToChange = RoleType.valueOf(roleType.toUpperCase());
     return ResponseEntity.ok(teamService.changeUserRole(teamId, requestorId, targetId, roleType));
   }
 }
