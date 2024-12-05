@@ -1,32 +1,17 @@
 package com.reddert.notificationsystem.team.dtos;
 
+import com.reddert.notificationsystem.team.model.MemberOf;
+import com.reddert.notificationsystem.team.model.Team;
 import java.util.UUID;
 
-public class UserMembershipDTO {
-  private UUID userId;
-  private UUID teamId;
-  private String teamName;
-  private String role;
+public record UserMembershipDTO(UUID userId, UUID teamId, String teamName, String roleTypeName) {
 
-  public UserMembershipDTO(UUID userId, UUID teamId, String teamName, String role) {
-    this.userId = userId;
-    this.teamId = teamId;
-    this.teamName = teamName;
-    this.role = role;
-  }
-
-  public UUID getUserId() {
-    return userId;
-  }
-  public UUID getTeamId() {
-    return teamId;
-  }
-
-  public String getTeamName() {
-    return teamName;
-  }
-
-  public String getRole() {
-    return role;
+  public static UserMembershipDTO fromEntity(MemberOf member) {
+    Team team = member.getTeam();
+    return new UserMembershipDTO(
+        member.getUser().getId(),
+        team.getId(),
+        team.getName(),
+        member.getRole().getRoleType().name());
   }
 }
