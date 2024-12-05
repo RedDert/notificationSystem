@@ -172,7 +172,7 @@ public class TeamService {
   public List<TeamDTO> getAllTeams() {
 
     List<Team> teams = teamRepository.findAll();
-    if (teams.size() == 0) {
+    if (teams.isEmpty()) {
       throw new EntityNotFoundException("No Teams found");
     }
     return teams.stream()
@@ -265,8 +265,8 @@ public class TeamService {
   }
 
   @Transactional
-  public UserMembershipDTO deleteMemberFromTeam(UUID teamId, UUID requesterId, UUID targetId)
-      throws AccessDeniedException {
+  public UserMembershipDTO deleteMemberFromTeam(UUID teamId, UUID requesterId, UUID targetId) {
+
 
     MemberOfId requesterMemberOfId = new MemberOfId(requesterId, teamId);
     memberOfRepository
