@@ -12,5 +12,11 @@ public interface MemberOfRepository extends JpaRepository<MemberOf, MemberOfId> 
 
   List<MemberOf> findAllByTeamId(UUID teamId);
 
+  List<MemberOf> findAllByTeam_IdAndRole_RoleType(UUID teamId, RoleType roleType);
+
   RoleType findRole_RoleTypeByTeam_IdAndUser_Id(UUID teamId, UUID userId);
+
+  RoleType findRole_RoleTypeById(MemberOfId memberId);
+
+  boolean existsByTeamId(UUID teamId);
 }
