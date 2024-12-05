@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import com.reddert.notificationsystem.team.exceptions.TeamExceptionHandler;
 import com.reddert.notificationsystem.user.model.User;
 
 import jakarta.persistence.Entity;
