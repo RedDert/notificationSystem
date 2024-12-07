@@ -1,0 +1,40 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Owner
+actor Admin
+actor Member
+actor Guest
+
+rectangle "Team Management" {
+    usecase "Delete Any Member" as UC1
+    usecase "Delete Non-Admin Members" as UC2
+    usecase "Cannot Delete Members" as UC3
+}
+
+Owner --> UC1
+Admin --> UC2
+
+Member --> UC3
+Guest --> UC3
+
+note right of Owner
+  - Can delete any member
+end note
+
+note right of Admin
+  - Can delete Members and Guests
+  - Cannot delete Owners or other Admins
+end note
+
+note right of Member
+  - Cannot delete any members
+end note
+
+note right of Guest
+  - Cannot delete any members
+end note
+
+@enduml
+
