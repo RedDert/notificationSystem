@@ -3,6 +3,7 @@ package com.reddert.notificationsystem.user.controller;
 import com.reddert.notificationsystem.user.dtos.CreateUserDTO;
 import com.reddert.notificationsystem.user.dtos.UserDTO;
 import com.reddert.notificationsystem.user.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +22,10 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody CreateUserDTO createUserDTO) {
-        UserDTO createdUser = userService.createUser(createUserDTO);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(createUserDTO));
     }
+
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
