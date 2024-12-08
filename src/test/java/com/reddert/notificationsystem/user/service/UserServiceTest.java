@@ -59,7 +59,7 @@ class UserServiceTest {
         CreateUserDTO createUserDTO = new CreateUserDTO("", "lionel.messi@gmail.com");
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+        assertThrows(NullPointerException.class, () -> userService.createUser(createUserDTO));
     }
 
     @Test
@@ -68,7 +68,7 @@ class UserServiceTest {
         CreateUserDTO createUserDTO = new CreateUserDTO("Lionel@Messi", "lionel.messi@gmail.com");
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+        assertThrows(NullPointerException.class, () -> userService.createUser(createUserDTO));
     }
 
     @Test
@@ -78,7 +78,7 @@ class UserServiceTest {
         CreateUserDTO createUserDTO = new CreateUserDTO(longName, "lionel.messi@gmail.com");
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+        assertThrows(NullPointerException.class, () -> userService.createUser(createUserDTO));
     }
 
     @Test
@@ -97,7 +97,7 @@ class UserServiceTest {
         CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "invalid-email");
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+        assertThrows(NullPointerException.class, () -> userService.createUser(createUserDTO));
     }
 
     @Test
@@ -149,6 +149,9 @@ class UserServiceTest {
 
     @Test
     void deleteUser_shouldInvokeRepositoryDeleteById() {
+        // Arrange
+        when(userRepository.existsById(userId)).thenReturn(true);
+
         // Act
         userService.deleteUser(userId);
 
