@@ -1,6 +1,7 @@
 package com.reddert.notificationsystem.user.service;
 
 import com.reddert.notificationsystem.user.model.User;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
@@ -18,20 +19,9 @@ public class UserService {
     }
 
     public UserDTO createUser(CreateUserDTO createUserDTO) {
-        if (createUserDTO.name() == null || createUserDTO.name().trim().isEmpty()) {
-            throw new IllegalArgumentException("User name cannot be empty.");
-        }
-        if (!createUserDTO.name().matches("[A-Za-z\\s]+")) {
-            throw new IllegalArgumentException("User name can only contain alphabetic characters.");
-        }
-        if (createUserDTO.name().length() > 100) {
-            throw new IllegalArgumentException("User name is too long.");
-        }
+        // Check for duplicate email
         if (userRepository.findByEmail(createUserDTO.email()).isPresent()) {
             throw new IllegalArgumentException("Email is already associated with an existing user.");
-        }
-        if (isValidEmail(createUserDTO.email())) {
-            throw new IllegalArgumentException("Invalid email format.");
         }
 
         User user = new User(createUserDTO.name(), createUserDTO.email());
@@ -49,18 +39,20 @@ public class UserService {
     public UserDTO getUserById(UUID id) {
         return userRepository.findById(id)
                 .map(UserDTO::fromEntity)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
     }
 
     public UserDTO updateUser(UUID id, CreateUserDTO createUserDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        if (createUserDTO.name().length() > 100) {
-            throw new IllegalArgumentException("User name is too long.");
-        }
-        if (isValidEmail(createUserDTO.email())) {
-            throw new IllegalArgumentException("Invalid email format.");
-        }
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+
+        // Check for duplicate email (if it's being changed)
+        userRepository.findByEmail(createUserDTO.email())
+                .filter(existingUser -> !existingUser.getId().equals(id))
+                .ifPresent(existingUser -> {
+                    throw new IllegalArgumentException("Email is already associated with another user.");
+                });
+
         user.setName(createUserDTO.name());
         user.setEmail(createUserDTO.email());
         User updatedUser = userRepository.save(user);
@@ -68,11 +60,9 @@ public class UserService {
     }
 
     public void deleteUser(UUID id) {
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("User not found with ID: " + id);
+        }
         userRepository.deleteById(id);
-    }
-
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        return email == null || !email.matches(emailRegex);
     }
 }
