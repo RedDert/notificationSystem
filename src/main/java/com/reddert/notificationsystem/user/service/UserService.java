@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,6 +16,7 @@ import com.reddert.notificationsystem.user.dtos.UserDTO;
 import com.reddert.notificationsystem.user.repository.UserRepository;
 
 @Service
+@Validated
 public class UserService {
     private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -51,7 +54,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO updateUser(UUID id, CreateUserDTO createUserDTO) {
+    public UserDTO updateUser(UUID id, @Valid CreateUserDTO createUserDTO) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
 
