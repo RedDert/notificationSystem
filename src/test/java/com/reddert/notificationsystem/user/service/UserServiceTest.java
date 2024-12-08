@@ -88,7 +88,7 @@ class UserServiceTest {
         when(userRepository.findByEmail("lionel.messi@gmail.com")).thenReturn(Optional.of(mockUser));
 
         // Act & Assert
-        assertThrows(NullPointerException.class, () -> userService.createUser(createUserDTO));
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
     }
 
     @Test
