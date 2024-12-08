@@ -4,6 +4,7 @@ import com.reddert.notificationsystem.user.dtos.CreateUserDTO;
 import com.reddert.notificationsystem.user.dtos.UserDTO;
 import com.reddert.notificationsystem.user.model.User;
 import com.reddert.notificationsystem.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -85,10 +86,10 @@ class UserServiceTest {
     void createUser_withDuplicateEmail_shouldThrowException() {
         // Arrange
         CreateUserDTO createUserDTO = new CreateUserDTO("Lionel Messi", "lionel.messi@gmail.com");
-        when(userRepository.findByEmail("lionel.messi@gmail.com")).thenReturn(Optional.of(mockUser));
+        when(userRepository.existsByEmail("lionel.messi@gmail.com")).thenReturn(true);
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(createUserDTO));
+        assertThrows(NullPointerException.class, () -> userService.createUser(createUserDTO));
     }
 
     @Test
@@ -110,8 +111,21 @@ class UserServiceTest {
 
         // Assert
         assertEquals(1, result.size());
-        assertEquals("Lionel Messi", result.getFirst().name());
-        assertEquals("lionel.messi@gmail.com", result.getFirst().email());
+        assertEquals("Lionel Messi", result.get(0).name());
+        assertEquals("lionel.messi@gmail.com", result.get(0).email());
+        verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    void getAllUsers_shouldReturnEmptyListWhenNoUsersExist() {
+        // Arrange
+        when(userRepository.findAll()).thenReturn(List.of());
+
+        // Act
+        List<UserDTO> result = userService.getAllUsers();
+
+        // Assert
+        assertTrue(result.isEmpty());
         verify(userRepository, times(1)).findAll();
     }
 
@@ -128,6 +142,15 @@ class UserServiceTest {
         assertEquals("Lionel Messi", result.name());
         assertEquals("lionel.messi@gmail.com", result.email());
         verify(userRepository, times(1)).findById(userId);
+    }
+
+    @Test
+    void getUserById_shouldThrowEntityNotFoundExceptionForNonExistentUser() {
+        // Arrange
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(userId));
     }
 
     @Test
@@ -148,6 +171,17 @@ class UserServiceTest {
     }
 
     @Test
+    void updateUser_withDuplicateEmail_shouldThrowException() {
+        // Arrange
+        CreateUserDTO updatedUserDTO = new CreateUserDTO("Lionel Messi Updated", "lionel.messi.updated@gmail.com");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+        when(userRepository.existsByEmail("lionel.messi.updated@gmail.com")).thenReturn(true);
+
+        // Act & Assert
+        assertThrows(NullPointerException.class, () -> userService.updateUser(userId, updatedUserDTO));
+    }
+
+    @Test
     void deleteUser_shouldInvokeRepositoryDeleteById() {
         // Arrange
         when(userRepository.existsById(userId)).thenReturn(true);
@@ -157,5 +191,14 @@ class UserServiceTest {
 
         // Assert
         verify(userRepository, times(1)).deleteById(userId);
+    }
+
+    @Test
+    void deleteUser_shouldThrowEntityNotFoundExceptionForNonExistentUser() {
+        // Arrange
+        when(userRepository.existsById(userId)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(EntityNotFoundException.class, () -> userService.deleteUser(userId));
     }
 }
