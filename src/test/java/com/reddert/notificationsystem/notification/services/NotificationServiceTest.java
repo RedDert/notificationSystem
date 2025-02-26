@@ -25,12 +25,12 @@ class NotificationServiceTest {
     private NotificationRepository notificationRepository;
 
     @Mock
-    private EmailService emailService;
+    private NotificationChannel notificationChannel;
 
     @Mock
     private UserRepository userRepository;
 
-    @InjectMocks
+    // We'll instantiate NotificationService manually to supply the list of channels.
     private NotificationService notificationService;
 
     private User mockUser;
@@ -39,14 +39,14 @@ class NotificationServiceTest {
 
     @BeforeEach
     void setUp() {
-        try (AutoCloseable mocks = MockitoAnnotations.openMocks(this)) {
-            userId = UUID.randomUUID();
-            notificationId = UUID.randomUUID();
-            mockUser = new User("Lionel Messi", "lionel.messi@gmail.com");
-            mockUser.setId(userId);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MockitoAnnotations.openMocks(this);
+        userId = UUID.randomUUID();
+        notificationId = UUID.randomUUID();
+        mockUser = new User("Lionel Messi", "lionel.messi@gmail.com");
+        mockUser.setId(userId);
+
+        // Provide the channels list explicitly using the mocked notificationChannel.
+        notificationService = new NotificationService(notificationRepository, List.of(notificationChannel), userRepository);
     }
 
     @Test
@@ -54,6 +54,7 @@ class NotificationServiceTest {
         // Arrange
         CreateNotificationDTO createNotificationDTO = new CreateNotificationDTO("Test notification");
         Notification notification = new Notification("Test notification", false, mockUser);
+        notification.setId(notificationId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
@@ -66,11 +67,9 @@ class NotificationServiceTest {
         assertEquals("Test notification", result.message());
         verify(userRepository, times(1)).findById(userId);
         verify(notificationRepository, times(1)).save(any(Notification.class));
-        verify(emailService, times(1)).sendNotificationEmail(
-                eq(mockUser.getEmail()),
-                eq("New Notification"),
-                eq("You have a new notification: " + notification.getMessage())
-        );
+
+        // Verify that the channel's send() method was called
+        verify(notificationChannel, times(1)).send(notification);
     }
 
     @Test
@@ -85,7 +84,7 @@ class NotificationServiceTest {
 
         // Assert
         assertEquals(1, result.size());
-        assertEquals("Test notification", result.getFirst().message());
+        assertEquals("Test notification", result.get(0).message());
         verify(notificationRepository, times(1)).findByUser(mockUser);
     }
 
@@ -125,6 +124,24 @@ class NotificationServiceTest {
     }
 
     @Test
+    void markAsUnread_shouldUpdateNotificationAndReturnNotificationDTO() {
+        // Arrange
+        Notification notification = new Notification("Test notification", true, mockUser);
+        notification.setId(notificationId);
+        when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(notification));
+        when(notificationRepository.save(notification)).thenReturn(notification);
+
+        // Act
+        NotificationDTO result = notificationService.markAsUnread(userId, notificationId);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(notificationId, result.id());
+        assertFalse(result.read());
+        verify(notificationRepository, times(1)).save(notification);
+    }
+
+    @Test
     void deleteNotification_shouldRemoveNotification() {
         // Arrange
         Notification notification = new Notification("Test notification", false, mockUser);
@@ -145,7 +162,9 @@ class NotificationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> notificationService.createNotification(userId, createNotificationDTO));
+        assertThrows(IllegalArgumentException.class, () ->
+                notificationService.createNotification(userId, createNotificationDTO)
+        );
     }
 
     @Test
@@ -156,18 +175,9 @@ class NotificationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> notificationService.createNotification(userId, createNotificationDTO));
-    }
-
-    @Test
-    void createNotification_withInvalidEmail_shouldThrowException() {
-        // Arrange
-        CreateNotificationDTO createNotificationDTO = new CreateNotificationDTO("Test message");
-        mockUser.setEmail("invalid-email");
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> notificationService.createNotification(userId, createNotificationDTO));
+        assertThrows(IllegalArgumentException.class, () ->
+                notificationService.createNotification(userId, createNotificationDTO)
+        );
     }
 
     @Test
@@ -177,6 +187,8 @@ class NotificationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(EntityNotFoundException.class, () -> notificationService.createNotification(userId, createNotificationDTO));
+        assertThrows(EntityNotFoundException.class, () ->
+                notificationService.createNotification(userId, createNotificationDTO)
+        );
     }
 }
