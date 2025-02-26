@@ -7,6 +7,7 @@ import com.reddert.notificationsystem.notification.repositories.NotificationRepo
 import com.reddert.notificationsystem.user.model.User;
 import com.reddert.notificationsystem.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,16 +18,15 @@ import java.util.stream.Collectors;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final EmailService emailService;
+    private final List<NotificationChannel> channels;
     private final UserRepository userRepository;
 
-    public NotificationService(
-            NotificationRepository notificationRepository,
-            EmailService emailService,
-            UserRepository userRepository
-    ) {
+    @Autowired
+    public NotificationService(NotificationRepository notificationRepository,
+                               List<NotificationChannel> channels,
+                               UserRepository userRepository) {
         this.notificationRepository = notificationRepository;
-        this.emailService = emailService;
+        this.channels = channels;
         this.userRepository = userRepository;
     }
 
@@ -43,26 +43,20 @@ public class NotificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        // Validate email
-        String recipientEmail = user.getEmail();
-        if (!isValidEmail(recipientEmail)) {
-            throw new IllegalArgumentException("Invalid email address.");
-        }
-
         // Create and save Notification
-        Notification notification = new Notification(
-                createNotificationDTO.message(),
-                false,
-                user
-        );
+        Notification notification = new Notification(createNotificationDTO.message(), false, user);
         Notification savedNotification = notificationRepository.save(notification);
 
-        // Send Email
-        emailService.sendNotificationEmail(
-                recipientEmail,
-                "New Notification",
-                "You have a new notification: " + savedNotification.getMessage()
-        );
+        // Dispatch notification via all channels
+        channels.forEach(channel -> {
+            try {
+                channel.send(savedNotification);
+            } catch (Exception e) {
+                // Optionally log the exception or handle channel-specific failures
+                System.err.println("Failed to send via "
+                        + channel.getClass().getSimpleName() + ": " + e.getMessage());
+            }
+        });
 
         return NotificationDTO.fromEntity(savedNotification);
     }
@@ -114,10 +108,5 @@ public class NotificationService {
         }
 
         return notification;
-    }
-
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        return email != null && email.matches(emailRegex);
     }
 }
