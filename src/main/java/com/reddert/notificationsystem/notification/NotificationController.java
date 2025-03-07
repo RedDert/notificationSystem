@@ -6,6 +6,7 @@ import com.reddert.notificationsystem.notification.services.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class NotificationController {
     @PostMapping
     public ResponseEntity<NotificationDTO> createNotification(
             @PathVariable UUID userId,
-            @RequestBody CreateNotificationDTO createNotificationDTO
+            @Valid @RequestBody CreateNotificationDTO createNotificationDTO
     ) {
         return ResponseEntity.ok(
                 notificationService.createNotification(userId, createNotificationDTO)

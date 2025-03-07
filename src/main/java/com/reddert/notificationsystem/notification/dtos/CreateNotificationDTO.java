@@ -1,4 +1,11 @@
 package com.reddert.notificationsystem.notification.dtos;
 
-public record CreateNotificationDTO(String message) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record CreateNotificationDTO(
+        @NotBlank(message = "Notification message cannot be blank")
+        @Size(max = 500, message = "Notification message is too long")
+        String message
+) {
 }

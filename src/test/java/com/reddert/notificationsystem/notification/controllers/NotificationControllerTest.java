@@ -6,7 +6,6 @@ import com.reddert.notificationsystem.notification.dtos.NotificationDTO;
 import com.reddert.notificationsystem.notification.services.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -16,7 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -97,5 +97,28 @@ class NotificationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Test notification"));
+    }
+
+    // --- Validation Tests ---
+
+    @Test
+    void createNotification_withBlankMessage_shouldReturnBadRequest() throws Exception {
+        String requestBody = "{\"message\":\"\"}";
+
+        mockMvc.perform(post("/users/{userId}/notifications", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createNotification_withTooLongMessage_shouldReturnBadRequest() throws Exception {
+        String longMessage = "a".repeat(501);
+        String requestBody = "{\"message\":\"" + longMessage + "\"}";
+
+        mockMvc.perform(post("/users/{userId}/notifications", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -53,11 +53,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>jakarta.validation</groupId>
-			<artifactId>jakarta.validation-api</artifactId>
-			<version>3.0.2</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-    <dependency>
+		<dependency>
       <groupId>com.github.davidmoten</groupId>
       <artifactId>plantuml-maven-plugin</artifactId>
       <version>0.2.12</version>
