@@ -9,6 +9,8 @@ import java.util.UUID;
 @Entity
 public class Notification {
 
+    private static final String USER_CANNOT_BE_NULL = "User cannot be null for a notification.";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -32,7 +34,7 @@ public class Notification {
 
     public Notification(String message, boolean read, User user) {
         if (user == null) {
-            throw new IllegalArgumentException("User cannot be null for a notification.");
+            throw new IllegalArgumentException(USER_CANNOT_BE_NULL);
         }
         this.message = message;
         this.read = read;
