@@ -23,7 +23,6 @@ public class NotificationService {
     private static final String USER_NOT_FOUND = "User not found";
     private static final String NOTIFICATION_NOT_FOUND = "Notification not found";
     private static final String NOTIFICATION_DOES_NOT_BELONG_TO_USER = "Notification does not belong to the user";
-    private static final String FAILED_TO_SEND_VIA_CHANNEL = "Failed to send via ";
 
     private final NotificationRepository notificationRepository;
     private final List<NotificationChannel> channels;
