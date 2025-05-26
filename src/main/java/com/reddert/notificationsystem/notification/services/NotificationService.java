@@ -17,6 +17,14 @@ import java.util.stream.Collectors;
 @Service
 public class NotificationService {
 
+    // Constants for error messages
+    private static final String NOTIFICATION_MESSAGE_CANNOT_BE_EMPTY = "Notification message cannot be empty.";
+    private static final String NOTIFICATION_MESSAGE_TOO_LONG = "Notification message is too long.";
+    private static final String USER_NOT_FOUND = "User not found";
+    private static final String NOTIFICATION_NOT_FOUND = "Notification not found";
+    private static final String NOTIFICATION_DOES_NOT_BELONG_TO_USER = "Notification does not belong to the user";
+    private static final String FAILED_TO_SEND_VIA_CHANNEL = "Failed to send via ";
+
     private final NotificationRepository notificationRepository;
     private final List<NotificationChannel> channels;
     private final UserRepository userRepository;
@@ -33,15 +41,15 @@ public class NotificationService {
     public NotificationDTO createNotification(UUID userId, CreateNotificationDTO createNotificationDTO) {
         // Validate message
         if (createNotificationDTO.message() == null || createNotificationDTO.message().trim().isEmpty()) {
-            throw new IllegalArgumentException("Notification message cannot be empty.");
+            throw new IllegalArgumentException(NOTIFICATION_MESSAGE_CANNOT_BE_EMPTY);
         }
         if (createNotificationDTO.message().length() > 500) {
-            throw new IllegalArgumentException("Notification message is too long.");
+            throw new IllegalArgumentException(NOTIFICATION_MESSAGE_TOO_LONG);
         }
 
         // Retrieve User
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
         // Create and save Notification
         Notification notification = new Notification(createNotificationDTO.message(), false, user);
@@ -63,7 +71,7 @@ public class NotificationService {
 
     public List<NotificationDTO> getAllNotificationsForUser(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
         return notificationRepository.findByUser(user)
                 .stream()
@@ -73,10 +81,10 @@ public class NotificationService {
 
     public NotificationDTO getNotificationById(UUID userId, UUID notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+                .orElseThrow(() -> new EntityNotFoundException(NOTIFICATION_NOT_FOUND));
 
         if (!notification.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Notification does not belong to the user");
+            throw new IllegalArgumentException(NOTIFICATION_DOES_NOT_BELONG_TO_USER);
         }
 
         return NotificationDTO.fromEntity(notification);
@@ -101,10 +109,10 @@ public class NotificationService {
 
     private Notification getNotificationByUserId(UUID userId, UUID notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
+                .orElseThrow(() -> new EntityNotFoundException(NOTIFICATION_NOT_FOUND));
 
         if (!notification.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Notification does not belong to the user");
+            throw new IllegalArgumentException(NOTIFICATION_DOES_NOT_BELONG_TO_USER);
         }
 
         return notification;
