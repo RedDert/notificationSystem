@@ -4,8 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record CreateNotificationDTO(
-        @NotBlank(message = "Notification message cannot be blank")
-        @Size(max = 500, message = "Notification message is too long")
+
+
+        @NotBlank(message = MESSAGE_CANNOT_BE_BLANK)
+        @Size(max = 500, message = MESSAGE_TOO_LONG)
         String message
 ) {
+
+        private static final String MESSAGE_CANNOT_BE_BLANK = "Notification message cannot be blank";
+        private static final String MESSAGE_TOO_LONG = "Notification message is too long";
 }
