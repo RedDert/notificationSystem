@@ -13,6 +13,12 @@ import jakarta.persistence.EntityNotFoundException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    //consts for error messages
+
+    private static final String AN_ERROR_OCCURRED = "An error occurred: ";
+    private static final String ENTITY_NOT_FOUND = "Entity not found: ";
+    private static final String WRONG_ARGUMENT = "Wrong argument: ";
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -29,18 +35,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleGlobalException(Exception ex, WebRequest request) {
-        return "An error occurred: " + ex.getMessage();
+        return AN_ERROR_OCCURRED + ex.getMessage();
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleEntityNotFoundException(Exception ex, WebRequest request) {
-        return "Entity not found: " + ex.getMessage();
+        return ENTITY_NOT_FOUND + ex.getMessage();
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleMethodArgumentTypeMismatchException(Exception ex, WebRequest request) {
-        return "Wrong argument: " + ex.getMessage();
+        return WRONG_ARGUMENT + ex.getMessage();
     }
 }
