@@ -30,6 +30,12 @@ public class TeamService {
 
   private static final String OWNER_ROLE_NOT_FOUND = "OWNER role not found, critical Exception";
 
+  private static final String ALREADY_MEMBER_OF_TEAM = "User is already a member of the team.";
+
+  private static final String TEAM_NOT_FOUND = "Team not found with ID: ";
+
+  private static final String USER_NOT_FOUND = "User not found with ID: ";
+
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
   private final MemberOfRepository memberOfRepository;
@@ -73,16 +79,16 @@ public class TeamService {
     RoleType roleType = RoleType.MEMBER;
     MemberOfId memberOfId = new MemberOfId(userId, teamId);
     if (memberOfRepository.existsById(memberOfId)) {
-      throw new IllegalArgumentException("User is already a member of the team.");
+      throw new IllegalArgumentException(ALREADY_MEMBER_OF_TEAM);
     }
 
     // Check if team, user, and role exist
     Team team = teamRepository
         .findById(teamId)
-        .orElseThrow(() -> new EntityNotFoundException("Team not found with ID: " + teamId));
+        .orElseThrow(() -> new EntityNotFoundException(TEAM_NOT_FOUND + teamId));
     User user = userRepository
         .findById(userId)
-        .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+        .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND + userId));
     Role role = roleRepository
         .findByRoleType(roleType)
         .orElseThrow(
@@ -106,7 +112,7 @@ public class TeamService {
     // Verify the team exists
     teamRepository
         .findById(teamId)
-        .orElseThrow(() -> new EntityNotFoundException("Team not found with ID: " + teamId));
+        .orElseThrow(() -> new EntityNotFoundException(TEAM_NOT_FOUND + teamId));
 
     // Verify the requestor's membership and role in the team
     MemberOfId requestorMemberOfId = new MemberOfId(targetUserId, teamId);
@@ -141,7 +147,7 @@ public class TeamService {
   public List<UserMembershipDTO> getUserMemberships(UUID userId) {
     userRepository
         .findById(userId)
-        .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+        .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND + userId));
 
     return memberOfRepository.findAllByUserId(userId).stream()
         .map(
@@ -159,7 +165,7 @@ public class TeamService {
     // Check if the team exists
     teamRepository
         .findById(teamId)
-        .orElseThrow(() -> new EntityNotFoundException("Team not found with ID: " + teamId));
+        .orElseThrow(() -> new EntityNotFoundException(TEAM_NOT_FOUND + teamId));
 
     return memberOfRepository.findAllByTeamId(teamId).stream()
         .map(
