@@ -26,6 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TeamService {
 
+  private static final String USER_DOES_NOT_EXIST = "User does not exist";
+
+  private static final String OWNER_ROLE_NOT_FOUND = "OWNER role not found, critical Exception";
+
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
   private final MemberOfRepository memberOfRepository;
@@ -46,7 +50,7 @@ public class TeamService {
   public TeamDTO createTeam(CreateTeamDTO createTeamDTO) {
     User owner = userRepository
         .findById(createTeamDTO.ownerId())
-        .orElseThrow(() -> new EntityNotFoundException("User does not exist"));
+        .orElseThrow(() -> new EntityNotFoundException(USER_DOES_NOT_EXIST));
 
     Team team = new Team(createTeamDTO.name());
     team = teamRepository.save(team);
@@ -54,7 +58,7 @@ public class TeamService {
     Role ownerRole = roleRepository
         .findByRoleType(RoleType.OWNER)
         .orElseThrow(
-            () -> new EntityNotFoundException("OWNER Role not found, critical Exception"));
+            () -> new EntityNotFoundException(OWNER_ROLE_NOT_FOUND));
     // Make owner member of team
     MemberOf memberOf = new MemberOf(owner, team, ownerRole);
     memberOf = memberOfRepository.save(memberOf);
