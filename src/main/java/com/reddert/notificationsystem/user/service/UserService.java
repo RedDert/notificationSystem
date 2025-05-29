@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 import com.reddert.notificationsystem.user.dtos.CreateUserDTO;
 import com.reddert.notificationsystem.user.dtos.UserDTO;
 import com.reddert.notificationsystem.user.repository.UserRepository;
+import static com.reddert.notificationsystem.user.UserErrorMessages.*;
+
 
 @Service
 @Validated
@@ -29,7 +31,7 @@ public class UserService {
     public UserDTO createUser(CreateUserDTO createUserDTO) {
         // Check for duplicate email
         if (userRepository.findByEmail(createUserDTO.email()).isPresent()) {
-            throw new IllegalArgumentException("Email is already associated with an existing user.");
+            throw new IllegalArgumentException(EMAIL_ALREADY_EXISTS);
         }
 
         User user = new User(createUserDTO.name(), createUserDTO.email());
@@ -50,18 +52,18 @@ public class UserService {
     public UserDTO getUserById(UUID id) {
         return userRepository.findById(id)
                 .map(UserDTO::fromEntity)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_WITH_ID + id));
     }
 
     @Transactional
     public UserDTO updateUser(UUID id, @Valid CreateUserDTO createUserDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND_WITH_ID + id));
 
         userRepository.findByEmail(createUserDTO.email())
                 .filter(existingUser -> !existingUser.getId().equals(id))
                 .ifPresent(existingUser -> {
-                    throw new IllegalArgumentException("Email is already associated with another user.");
+                    throw new IllegalArgumentException(EMAIL_EXISTS_FOR_ANOTHER_USER);
                 });
 
         user.setName(createUserDTO.name());
@@ -75,7 +77,7 @@ public class UserService {
     public void deleteUser(UUID id) {
         if (!userRepository.existsById(id)) {
             logger.warn("Attempt to delete non-existent user with ID: {}", id);
-            throw new EntityNotFoundException("User not found with ID: " + id);
+            throw new EntityNotFoundException(USER_NOT_FOUND_WITH_ID + id);
         }
         userRepository.deleteById(id);
         logger.info("Deleted user with ID: {}", id);
