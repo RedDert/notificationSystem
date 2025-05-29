@@ -8,16 +8,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import static com.reddert.notificationsystem.notification.NotificationsErrorMessages.*;
+
+
 import jakarta.persistence.EntityNotFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
-    //consts for error messages
-
-    private static final String AN_ERROR_OCCURRED = "An error occurred: ";
-    private static final String ENTITY_NOT_FOUND = "Entity not found: ";
-    private static final String WRONG_ARGUMENT = "Wrong argument: ";
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

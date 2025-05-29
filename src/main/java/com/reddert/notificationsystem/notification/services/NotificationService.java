@@ -6,6 +6,7 @@ import com.reddert.notificationsystem.notification.model.Notification;
 import com.reddert.notificationsystem.notification.repositories.NotificationRepository;
 import com.reddert.notificationsystem.user.model.User;
 import com.reddert.notificationsystem.user.repository.UserRepository;
+import static com.reddert.notificationsystem.notification.NotificationsErrorMessages.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class NotificationService {
-
-    // Constants for error messages
-    private static final String NOTIFICATION_MESSAGE_CANNOT_BE_EMPTY = "Notification message cannot be empty.";
-    private static final String NOTIFICATION_MESSAGE_TOO_LONG = "Notification message is too long.";
-    private static final String USER_NOT_FOUND = "User not found";
-    private static final String NOTIFICATION_NOT_FOUND = "Notification not found";
-    private static final String NOTIFICATION_DOES_NOT_BELONG_TO_USER = "Notification does not belong to the user";
 
     private final NotificationRepository notificationRepository;
     private final List<NotificationChannel> channels;

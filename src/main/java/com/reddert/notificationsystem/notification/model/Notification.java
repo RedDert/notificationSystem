@@ -1,6 +1,7 @@
 package com.reddert.notificationsystem.notification.model;
 
 import com.reddert.notificationsystem.user.model.User;
+import static com.reddert.notificationsystem.notification.NotificationsErrorMessages.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -8,8 +9,6 @@ import java.util.UUID;
 
 @Entity
 public class Notification {
-
-    private static final String USER_CANNOT_BE_NULL = "User cannot be null for a notification.";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
