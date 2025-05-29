@@ -15,8 +15,8 @@ import com.reddert.notificationsystem.team.repository.RoleRepository;
 import com.reddert.notificationsystem.team.repository.TeamRepository;
 import com.reddert.notificationsystem.user.model.User;
 import com.reddert.notificationsystem.user.repository.UserRepository;
+import static com.reddert.notificationsystem.team.TeamErrorMessages.*;
 import jakarta.persistence.EntityNotFoundException;
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -25,16 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TeamService {
-
-  private static final String USER_DOES_NOT_EXIST = "User does not exist";
-
-  private static final String OWNER_ROLE_NOT_FOUND = "OWNER role not found, critical Exception";
-
-  private static final String ALREADY_MEMBER_OF_TEAM = "User is already a member of the team.";
-
-  private static final String TEAM_NOT_FOUND = "Team not found with ID: ";
-
-  private static final String USER_NOT_FOUND = "User not found with ID: ";
 
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
